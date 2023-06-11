@@ -1,0 +1,4 @@
+Removed Pin From Net: NetName=GND Pin=Header EVEN pins-15
+Removed Pin From Net: NetName=GPIO26 Pin=Header EVEN pins-16
+Added Pin To Net: NetName=GPIO26 Pin=Header EVEN pins-15
+Added Pin To Net: NetName=GND Pin=Header EVEN pins-16

@@ -1,0 +1,6 @@
+Remove Pin=L298-5 From Net=GPIO21
+Remove Pin=L298-7 From Net=GPIO30
+Remove Pin=L298-11 From Net=GPIO12
+Add Pin To Net: Pin=L298-5 Old Net=GPIO21 New Net=GPIO5
+Add Pin To Net: Pin=L298-7 Old Net=GPIO30 New Net=GPIO4
+Add Pin To Net: Pin=L298-11 Old Net=GPIO12 New Net=GPIO1

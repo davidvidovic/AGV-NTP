@@ -1,0 +1,14 @@
+Removed Pin From Net: NetName=GPIO6 Pin=Header UNEVEN pins-11
+Removed Pin From Net: NetName=GPIO10 Pin=Header UNEVEN pins-12
+Removed Pin From Net: NetName=GPIO13 Pin=L298-5
+Removed Pin From Net: NetName=GPIO12 Pin=L298-6
+Removed Pin From Net: NetName=GPIO14 Pin=L298-7
+Removed Pin From Net: NetName=GPIO10 Pin=L298-11
+Removed Pin From Net: NetName=GPIO6 Pin=L298-12
+Added Pin To Net: NetName=GPIO13 Pin=Header UNEVEN pins-11
+Added Pin To Net: NetName=GPIO14 Pin=Header UNEVEN pins-12
+Added Pin To Net: NetName=GPIO10 Pin=L298-5
+Added Pin To Net: NetName=GPIO10 Pin=L298-6
+Added Pin To Net: NetName=GPIO11 Pin=L298-7
+Added Pin To Net: NetName=GPIO15 Pin=L298-11
+Added Pin To Net: NetName=GPIO31 Pin=L298-12
