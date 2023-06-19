@@ -16,11 +16,11 @@ float measure_distance_front()
 	digitalWrite(TRIGGER_FRONT, 0);
 	
 	// Measuring distance starts as the ECHO pin becomes HIGH
-	while(ECHO_FRONT == 0) start_time = micros();
+	while(digitalRead(ECHO_FRONT == 0)) start_time = micros();
 	
 	// While ECHO pin is HIGH, ultrasonic waves have not returned to the reciever
 	// As the waves return, ECHO pin becames LOW
-	while(ECHO_FRONT == 1) finish_time = micros();
+	while(digitalRead(ECHO_FRONT == 1)) finish_time = micros();
 	
 	// Calculating distance based on time elapsed and known speed of sound in the air
 	return (float)(finish_time - start_time) * 34300.0 / 2;
@@ -38,9 +38,9 @@ float measure_distance_back()
 	delayMicroseconds(10);
 	digitalWrite(TRIGGER_BACK, 0);
 	
-	while(ECHO_BACK == 0) start_time = micros();
+	while(digitalRead(ECHO_BACK == 0)) start_time = micros();
 	
-	while(ECHO_BACK == 1) finish_time = micros();
+	while(digitalRead(ECHO_BACK == 1)) finish_time = micros();
 
 	return (float)(finish_time - start_time) * 34300.0 / 2;
 }
