@@ -5,23 +5,23 @@
 
 // Macros used to indicate which GPIO pins are connected to L298 pins
 // Motor 1 macros
-#define IN1				5
-#define IN2				4
-#define ENABLE_A			10
+#define IN1		5
+#define IN2		4
+#define ENABLE_A	10
 
 // Motor 2 macros
-#define IN3				11
-#define IN4				31
-#define ENABLE_B			15
+#define IN3		11
+#define IN4		31
+#define ENABLE_B	15
 
 // Macros used to indicate which GPIO pins are connected to HC-SR04 pins
 // Front HC-SR04
-#define ECHO_FRONT			28
-#define TRIGGER_FRONT			27
+#define ECHO_FRONT	28
+#define TRIGGER_FRONT	27
 
 // Back HC-SR04
-#define ECHO_FRONT			7
-#define TRIGGER_FRONT			25
+#define ECHO_FRONT	7
+#define TRIGGER_FRONT	25
 
 
 // Funtions declaration

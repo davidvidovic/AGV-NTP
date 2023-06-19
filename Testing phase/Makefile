@@ -1,12 +1,12 @@
 CC := gcc
-CFLAGS := -Wall -Wextra
+CFLAGS :=
 LDFLAGS := -lwiringPi -lwiringPiDev
 
 # Name of the target executable
 TARGET := AGV
 
 # Source files
-SRCS := main.c
+SRCS := main.c pins.c ultrasonic_sensor.c motor_control.c color_sensor.c
 
 # Object files
 OBJS := $(SRCS:.c=.o)

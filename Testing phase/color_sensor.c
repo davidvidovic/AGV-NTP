@@ -1,7 +1,8 @@
 #include "color_sensor.h"
 
 // Functions implementation
-int init_color_sensor(){
+int init_color_sensor()
+{
 	// I2C initialization
 	int fd;
 	fd = wiringPiI2CSetup(SENSOR_ADDRESS);
