@@ -1,5 +1,6 @@
 #include "pins.h"
 
+// Function implementation
 void initGPIO()
 {
 	// Motor 1
@@ -13,10 +14,12 @@ void initGPIO()
 	pinMode(ENABLE_B, 		PWM_OUTPUT);
 	
 	// Front HC-SR04
-	pinMode(TRIGGER_FRONT, 	OUTPUT);
-	pinMode(ECHO_FRONT, 	INPUT);
+	pinMode(TRIGGER_FRONT, 		OUTPUT);
+	pinMode(ECHO_FRONT, 		INPUT);
 	
 	// Back HC-SR04
-	pinMode(TRIGGER_BACK, 	OUTPUT);
+	pinMode(TRIGGER_BACK, 		OUTPUT);
 	pinMode(ECHO_BACK, 		INPUT);
+	
+	// ### Add PWM settings
 }
