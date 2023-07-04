@@ -57,3 +57,4 @@ void turnRight()
 	// Motor 2
 	digitalWrite(IN3, 1);
 	digitalWrite(IN4, 0);
+}

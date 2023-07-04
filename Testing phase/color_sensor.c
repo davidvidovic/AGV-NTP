@@ -1,5 +1,9 @@
 #include "color_sensor.h"
 
+// Delete if not neccessary
+#include <wiringPi.h>
+#include <wiringPiI2C.h>
+
 // Functions implementation
 int init_color_sensor()
 {
@@ -20,7 +24,7 @@ int init_color_sensor()
 		printf("Error! Sensor not found.");
 		return -1;
 	}
-	else	printf("Sensor found! Sensor ID is %s.\n", ID);
+	else	printf("Sensor found! Sensor ID is %d.\n", ID);
 	
 	// Set RGBC time to a near maximum sample rate
 	wiringPiI2CWriteReg8(fd, SENSOR_RGBC_REG, 0xC0);

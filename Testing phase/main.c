@@ -9,7 +9,6 @@
 #include "motor_control.h"
 #include "color_sensor.h"
 
-
 int main(int argc, char *argv[])
 {
 	// Initializing wiringPi library

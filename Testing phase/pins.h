@@ -20,8 +20,8 @@
 #define TRIGGER_FRONT	27
 
 // Back HC-SR04
-#define ECHO_FRONT	7
-#define TRIGGER_FRONT	25
+#define ECHO_BACK	7
+#define TRIGGER_BACK	25
 
 
 // Funtions declaration
