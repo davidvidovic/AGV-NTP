@@ -9,6 +9,11 @@
 #include "motor_control.h"
 #include "color_sensor.h"
 
+// Defining tresholds for each color
+#define RED_TRESHOLD	255
+#define GREEN_TRESHOLD	255
+#define BLUE_TRESHOLD	255
+
 int main(int argc, char *argv[])
 {
 	// Initializing wiringPi library
@@ -16,6 +21,13 @@ int main(int argc, char *argv[])
 	
 	// Initializing GPIO pins
 	initGPIO();
+	
+	// Initializing PWM settings
+	initPWM();
+	
+	// Initially PWM is 0
+	// No need to explicitly call this function again, it will be called whenever the motor_control::stop() is called
+	PWM_OFF();
 	
 	// Initializing I2C communication and TCS3472 color sensor
 	int fd;
@@ -29,6 +41,87 @@ int main(int argc, char *argv[])
 		// Testing only!
 		printf("R: %d G: %d B: %d\n\n", read_RED(fd), read_GREEN(fd), read_BLUE(fd));
 		delay(1000);
+		
+		// After testing, uncomment the following blocks one by one and test
+		
+		// Turn when red is detected
+		/*
+		driveForward();
+		while(read_RED(fd) < RED_TRESHOLD);
+		stop();
+		delay(100);
+		turnLeft();
+		*/
+		
+		
+		// Turn when red is detected, keep turning until green is detected, then drive forward until red is detected, and do it in the other direction as well
+		/*
+		driveForward();
+		while(read_RED(fd) < RED_TRESHOLD);	// Possibly add delay
+		stop();
+		delay(100);
+		turnLeft();
+		
+		while(read_GREEN(fd) < GREEN_TRESHOLD);	// Possibly add delay
+		stop();
+		delay(100);
+		driveForward();
+		
+		driveForward();
+		while(read_RED(fd) < RED_TRESHOLD);	// Possibly add delay
+		stop();
+		delay(3000);
+		driveBackward();
+		
+		while(read_GREEN(fd) < GREEN_TRESHOLD);	// Possibly add delay
+		stop();
+		delay(100);
+		turnRight();
+		
+		while(read_RED(fd) < RED_TRESHOLD);	// Possibly add delay
+		stop();
+		delay(100);
+		driveForward();
+		*/
+		
+		
+		// Turn when red is detected, keep turning until green is detected, then drive forward until red is detected, but stop if something is in the way
+		/*
+		while(measure_distance_front() > 10)
+		{
+			driveForward();
+			while(read_RED(fd) < RED_TRESHOLD);	// Possibly add delay
+			stop();
+			delay(100);
+			turnLeft();
+			
+			while(read_GREEN(fd) < GREEN_TRESHOLD);	// Possibly add delay
+			stop();
+			delay(100);
+			driveForward();
+			
+			driveForward();
+			while(read_RED(fd) < RED_TRESHOLD);	// Possibly add delay
+			stop();
+			delay(100);
+		}
+		*/
+		
+		
+		
+		// ### NOTE:
+		/*
+		It will possibly be the easiest to have a bool variable "FORWARD", that will be passed as an argument to all motor_control functions
+		Examples:
+		drive_forward(1) -> drive_forward();
+		drive_forward(0) -> drive_backward();
+		
+		turnLeft(0) -> turnRight();
+		turnLeft(1) -> turnLeft();
+		
+		// Possibly hard to 
+		*/
+		
 	}
 	
 	return 0;
