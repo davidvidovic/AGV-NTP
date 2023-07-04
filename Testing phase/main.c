@@ -119,7 +119,112 @@ int main(int argc, char *argv[])
 		turnLeft(0) -> turnRight();
 		turnLeft(1) -> turnLeft();
 		
-		// Possibly hard to 
+		// Possibly hard
+		*/
+		
+		
+		
+		
+		/*
+		#define L112	1
+		#define L107	2
+		#define L108	3
+		#define L113	4
+		#define L109	5
+		...
+		
+		int redLinesCounted = 0;
+		int greenLinesCounted = 0;
+		int startDestination = L113;
+		int finalDestination = L107;
+		
+		
+		
+		// 1/3 PART OF TRIP
+		
+		// wait for the signal to start
+		driveForward();
+		while(lineCountRED(redLinesCounted) < startDestination)
+		{
+			while(measure_distance_front() < 20) stop();
+			driveForward();
+		}
+		
+		stop();
+		redLinesCounted = 0;
+		delay(100);
+		
+		if(startDestination < 111) turnRight();
+		else turnLeft();
+		
+		while(read_GREEN(fd) < GREEN_TRESHOLD)
+		{
+			while(measure_distance_front() < 20) stop();
+			
+			// Maybe without this?
+			if(startDestination < 111) turnRight();
+			else turnLeft();
+		}
+		
+		stop();
+		delay(100);
+		
+		
+		if(measure_distance_front() < 300) printf("Door seems to be closed.");
+		// wait for the signal and check if distance is > 300 (door is open)
+		
+		driveForward();
+		while(read_RED(fd) < RED_TRESHOLD)
+		{
+			while(measure_distance_front() < 20) stop();
+			driveForward();
+		}
+		
+		stop();
+		delay(100);
+		
+		// wait for signal that delivery is finished
+		
+		
+		
+		// 2/3 PART OF TRIP
+		
+		driveBackward();
+		while(read_GREEN(fd) < GREEN_TRESHOLD)
+		{
+			while(measure_distance_back() < 20) stop();
+			driveForward();
+		}
+		
+		stop();
+		delay(100);
+		
+		if(startDestination > finalDestination) turnRight();
+		else turnLeft();
+		
+		while(read_RED(fd) < RED_TRESHOLD)
+		{
+			while(measure_distance_back() < 20) stop();
+			driveForward();
+		}
+		
+		stop();
+		delay(100);
+		
+		driveBackward();
+		while(lineCountRED(redLinesCounted) < (startDestination - finalDestination))
+		{
+			while(measure_distance_back() < 20) stop();
+			driveBackward();
+		}
+		
+		stop();
+		redLinesCounted = 0;
+		delay(100);
+		
+		// turn towards the door and so on...
+		
+		
 		*/
 		
 	}
