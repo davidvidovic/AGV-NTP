@@ -24,10 +24,13 @@
 #define TRIGGER_BACK	25
 
 // PWM settings macros
-#define PWM_RANGE	3
-#define PWM_CLOCK	200
-#define EN_A_VALUE	1
-#define EN_B_VALUE	1
+
+// PWM freq = 19.2MHz / (PWM_CLOCK * PWM_RANGE)
+#define PWM_RANGE	100
+#define PWM_CLOCK	6
+
+#define EN_A_VALUE	50
+#define EN_B_VALUE	50
 
 
 // Funtions declaration
