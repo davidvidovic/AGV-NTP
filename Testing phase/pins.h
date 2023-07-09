@@ -7,12 +7,12 @@
 // Motor 1 macros
 #define IN1		5
 #define IN2		4
-#define ENABLE_A	10
+#define ENABLE_A	23
 
 // Motor 2 macros
 #define IN3		11
 #define IN4		31
-#define ENABLE_B	15
+#define ENABLE_B	1
 
 // Macros used to indicate which GPIO pins are connected to HC-SR04 pins
 // Front HC-SR04

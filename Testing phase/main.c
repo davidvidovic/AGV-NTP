@@ -10,9 +10,9 @@
 #include "color_sensor.h"
 
 // Defining tresholds for each color
-#define RED_TRESHOLD	255
-#define GREEN_TRESHOLD	255
-#define BLUE_TRESHOLD	255
+#define RED_TRESHOLD	500
+#define GREEN_TRESHOLD	500
+#define BLUE_TRESHOLD	500
 
 int main(int argc, char *argv[])
 {
@@ -38,21 +38,15 @@ int main(int argc, char *argv[])
 	
 	while(1)
 	{
-		// Testing only!
-		printf("R: %d G: %d B: %d\n\n", read_RED(fd), read_GREEN(fd), read_BLUE(fd));
-		delay(1000);
-		
-		// After testing, uncomment the following blocks one by one and test
-		
 		// Turn when red is detected
-		/*
+		
 		driveForward();
 		while(read_RED(fd) < RED_TRESHOLD);
 		stop();
 		delay(100);
 		turnLeft();
-		*/
-		
+		delay(3000);
+		stop();
 		
 		// Turn when red is detected, keep turning until green is detected, then drive forward until red is detected, and do it in the other direction as well
 		/*

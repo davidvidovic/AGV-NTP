@@ -20,7 +20,9 @@ int init_color_sensor()
 	wiringPiI2CWrite(fd, SENSOR_ID_REG);
 	ID = wiringPiI2CRead(fd);
 	
-	if(ID != 0x44 || ID != 0x4D){
+	// 77 = 0x4D
+	// 68 = 0x44
+	if(ID != 77 && ID != 68){
 		printf("Error! Sensor not found.");
 		return -1;
 	}
