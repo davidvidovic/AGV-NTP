@@ -4,6 +4,9 @@
 #include <QDialog>
 #include <QLabel>
 #include <QProgressBar>
+#include <QString>
+#include <QComboBox>
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Dialog; }
@@ -15,15 +18,24 @@ class Dialog : public QDialog
 
 public:
     Dialog(QWidget *parent = nullptr);
-    ~Dialog();
-    QLabel *label;
-    QProgressBar *progress_bar;
+    ~Dialog(); 
 
 private slots:
-
     void on_pushButton_clicked();
 
 private:
     Ui::Dialog *ui;
+    QString string;
+    QString array[8] = {"L106", "L107", "L108", "L109", "L110", "L111", "L112", "L113"};
+    QComboBox *box1;
+    QComboBox *box2;
+    QLabel *label_menu1;
+    QLabel *label_menu2;
+    QLabel *label_status_bar;
+    QLabel *label_item;
+    QProgressBar *progress_bar;
+
+    int delivery_stage = 0;
+
 };
 #endif // DIALOG_H
