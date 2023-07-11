@@ -1,6 +1,7 @@
 #ifndef COLOR_H
 #define	COLOR_H
 
+#include <stdio.h>
 #include <wiringPi.h>
 #include <wiringPiI2C.h>
 

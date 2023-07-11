@@ -26,8 +26,8 @@ void driveForward()
 	digitalWrite(IN2, 0);
 	
 	// Motor 2
-	digitalWrite(IN3, 1);
-	digitalWrite(IN4, 0);
+	digitalWrite(IN3, 0);
+	digitalWrite(IN4, 1);
 }
 
 void driveBackward()
@@ -39,8 +39,8 @@ void driveBackward()
 	digitalWrite(IN2, 1);
 	
 	// Motor 2
-	digitalWrite(IN3, 0);
-	digitalWrite(IN4, 1);
+	digitalWrite(IN3, 1);
+	digitalWrite(IN4, 0);
 }
 
 void turnLeft()
@@ -53,7 +53,7 @@ void turnLeft()
 	
 	// Motor 2
 	digitalWrite(IN3, 0);
-	digitalWrite(IN4, 1);
+	digitalWrite(IN4, 0);
 }
 
 void turnRight()
@@ -62,9 +62,9 @@ void turnRight()
 	
 	// Motor1
 	digitalWrite(IN1, 0);
-	digitalWrite(IN2, 1);
+	digitalWrite(IN2, 0);
 	
 	// Motor 2
-	digitalWrite(IN3, 1);
-	digitalWrite(IN4, 0);
+	digitalWrite(IN3, 0);
+	digitalWrite(IN4, 1);
 }

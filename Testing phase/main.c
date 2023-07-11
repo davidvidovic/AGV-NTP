@@ -39,15 +39,7 @@ int main(int argc, char *argv[])
 	while(1)
 	{
 		// Turn when red is detected
-		
-		driveForward();
-		while(read_RED(fd) < RED_TRESHOLD);
-		stop();
-		delay(100);
-		turnLeft();
-		delay(3000);
-		stop();
-		
+
 		// Turn when red is detected, keep turning until green is detected, then drive forward until red is detected, and do it in the other direction as well
 		/*
 		driveForward();
