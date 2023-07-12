@@ -40,7 +40,7 @@ DISTNAME      = untitled11.0.0
 DISTDIR = /home/david/Documents/AGV-NTP/Qt\ App/build-untitled1-Desktop-Debug/.tmp/untitled11.0.0
 LINK          = g++
 LFLAGS        = 
-LIBS          = $(SUBLIBS) /usr/lib/x86_64-linux-gnu/libQt5Widgets.so /usr/lib/x86_64-linux-gnu/libQt5Gui.so /usr/lib/x86_64-linux-gnu/libQt5Core.so -lGL -lpthread   
+LIBS          = $(SUBLIBS) -L/usr/local/lib -lwiringPi /usr/lib/x86_64-linux-gnu/libQt5Widgets.so /usr/lib/x86_64-linux-gnu/libQt5Gui.so /usr/lib/x86_64-linux-gnu/libQt5Core.so -lGL -lpthread   
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -114,6 +114,7 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt_config.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++/qmake.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_post.prf \
+		../untitled1/.qmake.stash \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exclusive_builds.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/toolchain.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/default_pre.prf \
@@ -204,6 +205,7 @@ Makefile: ../untitled1/untitled1.pro /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt_config.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++/qmake.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_post.prf \
+		.qmake.stash \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exclusive_builds.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/toolchain.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/default_pre.prf \
@@ -283,6 +285,7 @@ Makefile: ../untitled1/untitled1.pro /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt_config.prf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++/qmake.conf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_post.prf:
+.qmake.stash:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exclusive_builds.prf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/toolchain.prf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/default_pre.prf:
@@ -357,6 +360,10 @@ compiler_moc_header_make_all: moc_dialog.cpp
 compiler_moc_header_clean:
 	-$(DEL_FILE) moc_dialog.cpp
 moc_dialog.cpp: ../untitled1/dialog.h \
+		../../Testing_phase/color_sensor.h \
+		../../Testing_phase/motor_control.h \
+		../../Testing_phase/pins.h \
+		../../Testing_phase/ultrasonic_sensor.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
 	/usr/lib/qt5/bin/moc $(DEFINES) --include '/home/david/Documents/AGV-NTP/Qt App/build-untitled1-Desktop-Debug/moc_predefs.h' -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I'/home/david/Documents/AGV-NTP/Qt App/untitled1' -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/11 -I/usr/include/x86_64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/x86_64-linux-gnu/11/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../untitled1/dialog.h -o moc_dialog.cpp
@@ -382,10 +389,18 @@ compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean compiler_ui
 
 ####### Compile
 
-main.o: ../untitled1/main.cpp ../untitled1/dialog.h
+main.o: ../untitled1/main.cpp ../untitled1/dialog.h \
+		../../Testing_phase/color_sensor.h \
+		../../Testing_phase/motor_control.h \
+		../../Testing_phase/pins.h \
+		../../Testing_phase/ultrasonic_sensor.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../untitled1/main.cpp
 
 dialog.o: ../untitled1/dialog.cpp ../untitled1/dialog.h \
+		../../Testing_phase/color_sensor.h \
+		../../Testing_phase/motor_control.h \
+		../../Testing_phase/pins.h \
+		../../Testing_phase/ultrasonic_sensor.h \
 		ui_dialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o dialog.o ../untitled1/dialog.cpp
 
