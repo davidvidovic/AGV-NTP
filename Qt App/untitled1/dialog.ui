@@ -32,7 +32,7 @@
     <item>
      <widget class="QPushButton" name="pushButton">
       <property name="text">
-       <string>START TRIP</string>
+       <string>START DELIVERY</string>
       </property>
      </widget>
     </item>

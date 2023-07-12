@@ -7,6 +7,14 @@
 #include <QString>
 #include <QComboBox>
 
+#include <wiringPi.h>
+#include <wiringPiI2C.h>
+
+#include "../../Testing phase/color_sensor.h"
+#include "../../Testing phase/motor_control.h"
+#include "../../Testing phase/pins.h"
+#include "../../Testing phase/ultrasonic_sensor.h"
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Dialog; }
@@ -36,6 +44,16 @@ private:
     QProgressBar *progress_bar;
 
     int delivery_stage = 0;
+    int first_destination;
+    int second_destination;
+    int trip_finished;
+    unsigned char backward_flag = 0;
+    int fd;
+    int lines_counter = 0;
+
+    void FIRST_TRIP(int second_destination);
+    void DELIVERY_TRIP(int first_destination, int second_destination);
+    void HOME_TRIP(int first_destination);
 
 };
 #endif // DIALOG_H

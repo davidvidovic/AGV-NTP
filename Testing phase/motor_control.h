@@ -10,5 +10,7 @@ void driveForward();
 void driveBackward();
 void turnLeft();
 void turnRight();
+void backward_turnLeft();
+void backward_turnRight();
 
 #endif

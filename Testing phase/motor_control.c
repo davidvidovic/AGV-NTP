@@ -68,3 +68,29 @@ void turnRight()
 	digitalWrite(IN3, 0);
 	digitalWrite(IN4, 1);
 }
+
+void backward_turnLeft()
+{
+	PWM_ON();
+	
+	// Motor1
+	digitalWrite(IN1, 0);
+	digitalWrite(IN2, 0);
+	
+	// Motor 2
+	digitalWrite(IN3, 1);
+	digitalWrite(IN4, 0);
+}
+
+void backward_turnRight()
+{
+	PWM_ON();
+	
+	// Motor1
+	digitalWrite(IN1, 0);
+	digitalWrite(IN2, 1);
+	
+	// Motor 2
+	digitalWrite(IN3, 0);
+	digitalWrite(IN4, 0);
+}
