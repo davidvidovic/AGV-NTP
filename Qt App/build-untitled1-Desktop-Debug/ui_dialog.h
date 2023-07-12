@@ -64,7 +64,7 @@ public:
     void retranslateUi(QDialog *Dialog)
     {
         Dialog->setWindowTitle(QCoreApplication::translate("Dialog", "Dialog", nullptr));
-        pushButton->setText(QCoreApplication::translate("Dialog", "START TRIP", nullptr));
+        pushButton->setText(QCoreApplication::translate("Dialog", "START DELIVERY", nullptr));
     } // retranslateUi
 
 };

@@ -1,22 +1,7 @@
 #include "dialog.h"
 #include "ui_dialog.h"
 
-// Defining tresholds for each color
-#define RED_TRESHOLD	620
-#define GREEN_TRESHOLD	1300
-#define BLUE_TRESHOLD	500
 
-// Defining rooms - number of lines before and including that door - number of line on which robot should be triggered to turn
-#define HOME    0
-#define L106    1
-#define L107    4
-#define L108    5
-#define L109    6
-#define L110    9
-#define L111    2
-#define L112    3
-#define L113    7
-#define L114    8
 
 Dialog::Dialog(QWidget *parent)
     : QDialog(parent)
@@ -29,7 +14,7 @@ Dialog::Dialog(QWidget *parent)
     box1 = new QComboBox();
     box2 = new QComboBox();
 
-    for(int i = 0; i < 8; i++)
+    for(int i = 0; i < 9; i++)
     {
         box1->addItem(array[i]);
         box2->addItem(array[i]);
@@ -56,7 +41,7 @@ Dialog::Dialog(QWidget *parent)
 
     delivery_stage = 0;
     trip_finished = 0;
-    backward_flag = 0;
+    progress_sum = 0;
 
     // Initializing wiringPi library
     if(wiringPiSetup() < 0) 	printf("Error during library initialization.");
@@ -105,6 +90,8 @@ void Dialog::on_pushButton_clicked()
         ui->pushButton->setEnabled(false);
         box1->setEnabled(false);
         box2->setEnabled(false);
+
+        progress_bar->setValue(0);
 
         first_destination = box1->currentIndex();
         second_destination = box2->currentIndex();
@@ -166,6 +153,10 @@ void Dialog::on_pushButton_clicked()
             break;
         }
 
+        lines_counter = 0;
+        progress_count = 0;
+        progress_sum = first_destination + (abs(second_destination - first_destination)) + 2 + 5;  // NUM OF LINES ROBOT NEEDS TO GO OVER WHILE DELIVERING + 2 FOR 2 WAITING SPOTS
+
         string = "Robot is on its way to You!";
         label_status_bar->setText(string);
 
@@ -208,6 +199,7 @@ void Dialog::on_pushButton_clicked()
         ui->pushButton->setEnabled(true);
         break;
 
+
     // From second destination to HOME
     case 2:
         ui->pushButton->setEnabled(false);
@@ -239,17 +231,19 @@ void Dialog::FIRST_TRIP(int second_destination)
     // DRIVE FORWARD FROM THE HOME SPOT
 
     driveForward();
-    while(lines_counter != second_destination))
+    while(lines_counter != second_destination)
     {
         while((measure_distance_front() < 20) && (measure_distance_back() < 20) && (read_GREEN(fd) < GREEN_TRESHOLD));
 
         stop();
         delay(1000);
 
-        if(read_GREEN(fd) > GREEN_TRESHOLD) // while its over the line
+        if(read_GREEN(fd) > GREEN_TRESHOLD)
         {
-            while(read_GREEN(fd) > GREEN_TRESHOLD);
+            while(read_GREEN(fd) > GREEN_TRESHOLD);  // while its over the line
             lines_counter++;
+            progress_count++;
+            progress_bar->setValue((int)(progress_count / progress_sum * 100));
         }
         else
         {
@@ -259,6 +253,8 @@ void Dialog::FIRST_TRIP(int second_destination)
     }
 
     lines_counter = 0;
+    stop();
+    delay(1000);
 
 
     // TURN
@@ -269,6 +265,8 @@ void Dialog::FIRST_TRIP(int second_destination)
     while(read_GREEN(fd) < GREEN_TRESHOLD); // Keep turning until it hits the line
     stop();
     delay(1000);
+    progress_count++;
+    progress_bar->setValue((int)(progress_count / progress_sum * 100));
 
 
     // CHECK IF DOOR IS OPEN
@@ -292,10 +290,16 @@ void Dialog::FIRST_TRIP(int second_destination)
 // MIDDLE PART OF DELIVERY - FROM FIRST TO SECOND DESTINATION
 void Dialog::DELIVERY_TRIP(int first_destination, int second_destination)
 {
+    progress_count++;
+    progress_bar->setValue((int)(progress_count / progress_sum * 100));
+
     driveBackward();
     while(read_GREEN(fd) < GREEN_TRESHOLD);     // POSSIBLY ADD FOR IT TO CROSS THE LINE FIRST AND THEN TURN
     stop();
     delay(1000);
+
+    progress_count++;
+    progress_bar->setValue((int)(progress_count / progress_sum * 100));
 
     if(first_destination < 111)  // YOU ARE ON A RIGHT-HAND SIDE OF THE HALLWAY
         backward_turnLeft();
@@ -305,6 +309,9 @@ void Dialog::DELIVERY_TRIP(int first_destination, int second_destination)
     while(read_GREEN(fd) < GREEN_TRESHOLD); // Keep turning until it reaches the line
     stop();
     delay(1000);
+
+    progress_count++;
+    progress_bar->setValue((int)(progress_count / progress_sum * 100));
 
     if(second_destination - first_destination > 0)
     {
@@ -328,6 +335,9 @@ void Dialog::DELIVERY_TRIP(int first_destination, int second_destination)
         {
             while(read_GREEN(fd) > GREEN_TRESHOLD);
             lines_counter++;
+
+            progress_count++;
+            progress_bar->setValue((int)(progress_count / progress_sum * 100));
         }
         else
         {
@@ -345,6 +355,8 @@ void Dialog::DELIVERY_TRIP(int first_destination, int second_destination)
     }
 
     lines_counter = 0;
+    stop();
+    delay(1000);
 
     // TURN
 
@@ -355,6 +367,9 @@ void Dialog::DELIVERY_TRIP(int first_destination, int second_destination)
     stop();
     delay(1000);
 
+    progress_count++;
+    progress_bar->setValue((int)(progress_count / progress_sum * 100));
+
     // CHECK IF DOOR IS OPEN
 
     if(measure_distance_front() < 200)  // DOOR CLOSED - TO BE CALIBRATED
@@ -362,13 +377,20 @@ void Dialog::DELIVERY_TRIP(int first_destination, int second_destination)
         stop();
         string = "Door seems to be closed. Please open the door.";
         label_status_bar->setText(string);
+
         while(measure_distance_front() < 200);
+
+        string = "Door open! Continuing delivery.";
+        label_status_bar->setText(string);
     }
 
     // DRIVE FORWARD UNTIL IT REACHES THE LINE IN FRONT OF THE DOOR
     driveForward();
     while(read_GREEN(fd) < GREEN_TRESHOLD);
     stop();
+
+    progress_count++;
+    progress_bar->setValue((int)(progress_count / progress_sum * 100));
 }
 
 // FINAL PART OF DELIVERY - FROM SECONDD DESTINATION GET BACK TO HOME SPOT
@@ -379,6 +401,9 @@ void Dialog::HOME_TRIP(int first_destination)
     stop();
     delay(1000);
 
+    progress_count++;
+    progress_bar->setValue((int)(progress_count / progress_sum * 100));
+
     if(first_destination < 111)  // YOU ARE ON A RIGHT-HAND SIDE OF THE HALLWAY
         backward_turnLeft();
     else
@@ -387,6 +412,9 @@ void Dialog::HOME_TRIP(int first_destination)
     while(read_GREEN(fd) < GREEN_TRESHOLD); // Keep turning until it reaches the line
     stop();
     delay(1000);
+
+    progress_count++;
+    progress_bar->setValue((int)(progress_count / progress_sum * 100));
 
     driveBackward();
     while(read_RED(fd) < RED_TRESHOLD)   // Keep turning until it reaches the line - HOME LINE IS MARKED RED
@@ -409,4 +437,6 @@ void Dialog::HOME_TRIP(int first_destination)
     }
 
     stop();
+
+    progress_bar->setValue(100);  // DELIVERY OVER
 }

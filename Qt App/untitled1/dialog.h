@@ -10,11 +10,27 @@
 #include <wiringPi.h>
 #include <wiringPiI2C.h>
 
-#include "../../Testing phase/color_sensor.h"
-#include "../../Testing phase/motor_control.h"
-#include "../../Testing phase/pins.h"
-#include "../../Testing phase/ultrasonic_sensor.h"
+#include "../../Testing_phase/color_sensor.h"
+#include "../../Testing_phase/motor_control.h"
+#include "../../Testing_phase/pins.h"
+#include "../../Testing_phase/ultrasonic_sensor.h"
 
+// Defining tresholds for each color
+#define RED_TRESHOLD	620
+#define GREEN_TRESHOLD  1300
+#define BLUE_TRESHOLD	500
+
+// Defining rooms - number of lines before and including that door - number of line on which robot should be triggered to turn
+#define HOME    0
+#define L106    1
+#define L107    4
+#define L108    5
+#define L109    6
+#define L110    9
+#define L111    2
+#define L112    3
+#define L113    7
+#define L114    8
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Dialog; }
@@ -34,7 +50,7 @@ private slots:
 private:
     Ui::Dialog *ui;
     QString string;
-    QString array[8] = {"L106", "L107", "L108", "L109", "L110", "L111", "L112", "L113"};
+    QString array[9] = {"L106", "L107", "L108", "L109", "L110", "L111", "L112", "L113", "L114"};
     QComboBox *box1;
     QComboBox *box2;
     QLabel *label_menu1;
@@ -47,9 +63,10 @@ private:
     int first_destination;
     int second_destination;
     int trip_finished;
-    unsigned char backward_flag = 0;
     int fd;
     int lines_counter = 0;
+    int progress_sum = 0;
+    int progress_count = 0;
 
     void FIRST_TRIP(int second_destination);
     void DELIVERY_TRIP(int first_destination, int second_destination);
