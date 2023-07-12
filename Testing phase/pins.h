@@ -29,8 +29,8 @@
 #define PWM_RANGE	100
 #define PWM_CLOCK	5
 
-#define EN_A_VALUE	70
-#define EN_B_VALUE	70
+#define EN_A_VALUE	40
+#define EN_B_VALUE	60
 
 
 // Funtions declaration
