@@ -16,11 +16,14 @@
 #define SENSOR_GREEN_CH_HIGH	0x99
 #define SENSOR_BLUE_CH_LOW	0x9A
 #define SENSOR_BLUE_CH_HIGH	0x9B
+#define SENSOR_CLEAR_CH_LOW	0x94
+#define SENSOR_CLEAR_CH_HIGH	0x95
 
 // Funtions declaration
 int init_color_sensor();
 int read_RED(int fd);
 int read_GREEN(int fd);
 int read_BLUE(int fd);
+int read_CLEAR(int fd);
 
 #endif

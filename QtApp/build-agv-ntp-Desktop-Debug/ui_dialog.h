@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'dialog.ui'
 **
-** Created by: Qt User Interface Compiler version 5.15.3
+** Created by: Qt User Interface Compiler version 5.15.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -13,7 +13,6 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QGridLayout>
-#include <QtWidgets/QPlainTextEdit>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
@@ -26,7 +25,6 @@ public:
     QWidget *verticalLayoutWidget;
     QVBoxLayout *verticalLayout;
     QGridLayout *gridLayout;
-    QPlainTextEdit *plainTextEdit;
     QPushButton *pushButton;
 
     void setupUi(QDialog *Dialog)
@@ -36,7 +34,7 @@ public:
         Dialog->resize(800, 600);
         verticalLayoutWidget = new QWidget(Dialog);
         verticalLayoutWidget->setObjectName(QString::fromUtf8("verticalLayoutWidget"));
-        verticalLayoutWidget->setGeometry(QRect(20, 60, 561, 221));
+        verticalLayoutWidget->setGeometry(QRect(70, 50, 511, 291));
         verticalLayout = new QVBoxLayout(verticalLayoutWidget);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         verticalLayout->setContentsMargins(0, 0, 0, 0);
@@ -44,11 +42,6 @@ public:
         gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
 
         verticalLayout->addLayout(gridLayout);
-
-        plainTextEdit = new QPlainTextEdit(verticalLayoutWidget);
-        plainTextEdit->setObjectName(QString::fromUtf8("plainTextEdit"));
-
-        verticalLayout->addWidget(plainTextEdit);
 
         pushButton = new QPushButton(verticalLayoutWidget);
         pushButton->setObjectName(QString::fromUtf8("pushButton"));
@@ -64,7 +57,7 @@ public:
     void retranslateUi(QDialog *Dialog)
     {
         Dialog->setWindowTitle(QCoreApplication::translate("Dialog", "Dialog", nullptr));
-        pushButton->setText(QCoreApplication::translate("Dialog", "START DELIVERY", nullptr));
+        pushButton->setText(QCoreApplication::translate("Dialog", "PushButton", nullptr));
     } // retranslateUi
 
 };

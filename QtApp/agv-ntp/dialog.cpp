@@ -1,6 +1,35 @@
 #include "dialog.h"
 #include "ui_dialog.h"
 
+// Funtions declaration
+int init_color_sensor();
+int read_RED(int fd);
+int read_GREEN(int fd);
+int read_BLUE(int fd);
+
+// Function to init GPIO pins as inputs, outputs or PWM outputs
+// To be called in setup part of the program
+void initGPIO();
+
+// To be called in setup part of the program
+void initPWM();
+
+// Turn the PWM ON
+void PWM_ON(int, int);
+
+// Turn the PWM OFF
+void PWM_OFF();
+
+float measure_distance_front();
+float measure_distance_back();
+
+void stop();
+void driveForward();
+void driveBackward();
+void turnLeft();
+void turnRight();
+void backward_turnLeft();
+void backward_turnRight();
 
 
 Dialog::Dialog(QWidget *parent)
@@ -9,7 +38,10 @@ Dialog::Dialog(QWidget *parent)
 {
     ui->setupUi(this);
 
+
     // To be moved into a function called Init - it will be called after every delivery again
+    //gridLayout = new QGridLayout();
+
 
     box1 = new QComboBox();
     box2 = new QComboBox();
@@ -30,14 +62,24 @@ Dialog::Dialog(QWidget *parent)
     ui->gridLayout->addWidget(label_menu2, 0, 1);
 
     label_item = new QLabel("Describe an item You wish to be delivered:", this);
-    ui->gridLayout->addWidget(label_item, 2, 0);
+    //ui->gridLayout->addWidget(label_item, 2, 0);
+    ui->verticalLayout->insertWidget(1, label_item);
 
-    label_status_bar = new QLabel("Status bar...", this);
+    plain_text = new QPlainTextEdit();
+    //ui->gridLayout->addWidget(plain_text, 3, 0);
+    ui->verticalLayout->insertWidget(2, plain_text);
+
+    label_status_bar = new QLabel();
     ui->verticalLayout->insertWidget(3, label_status_bar);
+    string = "Status bar...";
+    label_status_bar->setText(string);
 
     progress_bar = new QProgressBar(this);
     progress_bar->setValue(0);
     ui->verticalLayout->insertWidget(5, progress_bar);
+
+    string = "START DELIVERY";
+    ui->pushButton->setText(string);
 
     delivery_stage = 0;
     trip_finished = 0;
@@ -62,6 +104,7 @@ Dialog::Dialog(QWidget *parent)
     // Initially stop the motors
     stop();
 
+
 }
 
 Dialog::~Dialog()
@@ -73,17 +116,6 @@ void Dialog::on_pushButton_clicked()
 {
     switch(delivery_stage)
     {
-    // Initial - ROBOT WILL RESTART THE COUNTER BY HIMSELF?
-    /*
-        string = "Waiting for delivery.";
-        label_status_bar->setText(string);
-
-        string = "START DELIVERY";
-        ui->pushButton->setText(string);
-
-        delivery_stage++;
-        break;
-    */
 
     // From start to first destination
     case 0:
@@ -91,7 +123,7 @@ void Dialog::on_pushButton_clicked()
         box1->setEnabled(false);
         box2->setEnabled(false);
 
-        progress_bar->setValue(0);
+        progress_bar->setValue(50);
 
         first_destination = box1->currentIndex();
         second_destination = box2->currentIndex();
@@ -123,6 +155,9 @@ void Dialog::on_pushButton_clicked()
         case 7:
             first_destination = L113;
             break;
+        case 8:
+            first_destination = L114;
+            break;
         }
 
         switch(second_destination)
@@ -151,14 +186,18 @@ void Dialog::on_pushButton_clicked()
         case 7:
             second_destination = L113;
             break;
+        case 8:
+            second_destination = L114;
+            break;
         }
+
 
         lines_counter = 0;
         progress_count = 0;
         progress_sum = first_destination + (abs(second_destination - first_destination)) + 2 + 5;  // NUM OF LINES ROBOT NEEDS TO GO OVER WHILE DELIVERING + 2 FOR 2 WAITING SPOTS
 
-        string = "Robot is on its way to You!";
-        label_status_bar->setText(string);
+        //string = "Robot is on its way to You!";
+        //label_status_bar->setText(string);
 
         // Wait until robot is at trip destination
         //trip_finished = 0;
@@ -166,8 +205,8 @@ void Dialog::on_pushButton_clicked()
         //while(trip_finished == 0);    ????? da li mi treba ovo
         //trip_finished = 0;
 
-        string = "Robot is at the door. Please load the item.";
-        label_status_bar->setText(string);
+        //string = "Robot is at the door. Please load the item.";
+        //label_status_bar->setText(string);
 
         string = "ITEM LOADED | START DELIVERY";
         ui->pushButton->setText(string);
@@ -183,13 +222,13 @@ void Dialog::on_pushButton_clicked()
         ui->pushButton->setEnabled(false);
 
         string = "Delivery underway...";
-        label_status_bar->setText(string);
+        //label_status_bar->setText(string);
 
         // Wait until robot is at trip destination
         DELIVERY_TRIP(first_destination, second_destination);
 
         string = "Item is delivered. Please unload the robot and confirm to finish delivery.";
-        label_status_bar->setText(string);
+        //label_status_bar->setText(string);
 
         string = "ITEM DELIVERED | FINISH DELIVERY";
         ui->pushButton->setText(string);
@@ -205,13 +244,13 @@ void Dialog::on_pushButton_clicked()
         ui->pushButton->setEnabled(false);
 
         string = "Robot is retrieving to home spot.";
-        label_status_bar->setText(string);
+        //label_status_bar->setText(string);
 
         // Wait until robot is at HOME destination
         HOME_TRIP(second_destination);
 
         string = "Robot is ready for next delivery.";
-        label_status_bar->setText(string);
+        //label_status_bar->setText(string);
 
         string = "START DELIVERY";
         ui->pushButton->setText(string);
@@ -229,48 +268,47 @@ void Dialog::on_pushButton_clicked()
 void Dialog::FIRST_TRIP(int second_destination)
 {
     // DRIVE FORWARD FROM THE HOME SPOT
-
     driveForward();
+    lines_counter = 0;
     while(lines_counter != second_destination)
     {
-        while((measure_distance_front() < 20) && (measure_distance_back() < 20) && (read_GREEN(fd) < GREEN_TRESHOLD));
-
-        stop();
-        delay(1000);
-
-        if(read_GREEN(fd) > GREEN_TRESHOLD)
+        printf("%d\n", read_GREEN(fd));
+        while(read_GREEN(fd) < GREEN_TRESHOLD)
         {
-            while(read_GREEN(fd) > GREEN_TRESHOLD);  // while its over the line
-            lines_counter++;
-            progress_count++;
-            progress_bar->setValue((int)(progress_count / progress_sum * 100));
+            printf("%d\n", read_GREEN(fd));
+            delay(20);
         }
-        else
-        {
-            while((measure_distance_front() > 20) || (measure_distance_back() > 20)) delay(500);
-            driveForward();
-        }
+
+        //while(read_GREEN(fd) > GREEN_TRESHOLD);  // while its over the line
+        delay(500);
+        printf("Presao liniju\n");
+        lines_counter++;
+        progress_count++;
+        progress_bar->setValue((int)(progress_count / progress_sum * 100));
     }
 
     lines_counter = 0;
     stop();
-    delay(1000);
+    delay(500);
 
 
     // TURN
 
-    if(second_destination < 111) turnLeft();
+    if(second_destination < 111) turnLeft();    // ZAMENI!!!!!!
     else turnRight();
 
-    while(read_GREEN(fd) < GREEN_TRESHOLD); // Keep turning until it hits the line
+    //delay(500);
+
+    while(read_GREEN(fd) < GREEN_TRESHOLD) delay(20); // Keep turning until it hits the line
+    printf("%d %d %d\n", read_GREEN(fd), read_BLUE(fd), read_RED(fd));
     stop();
-    delay(1000);
+    delay(500);
     progress_count++;
     progress_bar->setValue((int)(progress_count / progress_sum * 100));
 
 
     // CHECK IF DOOR IS OPEN
-
+/*
     if(measure_distance_front() < 200)  // DOOR CLOSED - TO BE CALIBRATED
     {
         stop();
@@ -278,11 +316,14 @@ void Dialog::FIRST_TRIP(int second_destination)
         label_status_bar->setText(string);
         while(measure_distance_front() < 200);
     }
-
+*/
     // DRIVE FORWARD UNTIL IT REACHES THE LINE IN FRONT OF THE DOOR
     driveForward();
+    delay(1000);
     while(read_GREEN(fd) < GREEN_TRESHOLD);
     stop();
+
+    printf("Vrata");
 
     //backward_flag = ~backward_flag;
 }
@@ -326,32 +367,14 @@ void Dialog::DELIVERY_TRIP(int first_destination, int second_destination)
 
     while(lines_counter != abs(second_destination - first_destination))
     {
-        while((measure_distance_front() < 20) && (measure_distance_back() < 20) && (read_GREEN(fd) < GREEN_TRESHOLD));
+        while(read_GREEN(fd) < GREEN_TRESHOLD);
 
-        stop();
-        delay(1000);
+        while(read_GREEN(fd) > GREEN_TRESHOLD);
+        lines_counter++;
 
-        if(read_GREEN(fd) > GREEN_TRESHOLD) // while its over the line
-        {
-            while(read_GREEN(fd) > GREEN_TRESHOLD);
-            lines_counter++;
+        progress_count++;
+        progress_bar->setValue((int)(progress_count / progress_sum * 100));
 
-            progress_count++;
-            progress_bar->setValue((int)(progress_count / progress_sum * 100));
-        }
-        else
-        {
-            while((measure_distance_front() > 20) || (measure_distance_back() > 20)) delay(500);
-
-            if(second_destination - first_destination > 0)
-            {
-                driveForward();
-            }
-            else
-            {
-                driveBackward();
-            }
-        }
     }
 
     lines_counter = 0;
@@ -371,7 +394,7 @@ void Dialog::DELIVERY_TRIP(int first_destination, int second_destination)
     progress_bar->setValue((int)(progress_count / progress_sum * 100));
 
     // CHECK IF DOOR IS OPEN
-
+/*
     if(measure_distance_front() < 200)  // DOOR CLOSED - TO BE CALIBRATED
     {
         stop();
@@ -383,7 +406,7 @@ void Dialog::DELIVERY_TRIP(int first_destination, int second_destination)
         string = "Door open! Continuing delivery.";
         label_status_bar->setText(string);
     }
-
+*/
     // DRIVE FORWARD UNTIL IT REACHES THE LINE IN FRONT OF THE DOOR
     driveForward();
     while(read_GREEN(fd) < GREEN_TRESHOLD);
@@ -419,6 +442,7 @@ void Dialog::HOME_TRIP(int first_destination)
     driveBackward();
     while(read_RED(fd) < RED_TRESHOLD)   // Keep turning until it reaches the line - HOME LINE IS MARKED RED
     {
+        /*
         if(measure_distance_back() < 20)
         {
             stop();
@@ -434,9 +458,272 @@ void Dialog::HOME_TRIP(int first_destination)
             string = "Robot is retrieving to home spot.";
             label_status_bar->setText(string);
         }
+        */
     }
 
     stop();
 
     progress_bar->setValue(100);  // DELIVERY OVER
+}
+
+
+
+// Function implementation
+void initGPIO()
+{
+    // Motor 1
+    pinMode(IN1, 		OUTPUT);
+    pinMode(IN2, 		OUTPUT);
+    pinMode(ENABLE_A, 	PWM_OUTPUT);
+
+    // Motor 2
+    pinMode(IN3, 		OUTPUT);
+    pinMode(IN4, 		OUTPUT);
+    pinMode(ENABLE_B, 	PWM_OUTPUT);
+
+    // Front HC-SR04
+    pinMode(TRIGGER_FRONT, 	OUTPUT);
+    pinMode(ECHO_FRONT, 	INPUT);
+
+    // Back HC-SR04
+    pinMode(TRIGGER_BACK, 	OUTPUT);
+    pinMode(ECHO_BACK, 	INPUT);
+}
+
+void initPWM()
+{
+    pwmSetClock(PWM_CLOCK);
+    pwmSetRange(PWM_RANGE);
+    pwmSetMode(PWM_MODE_MS);
+}
+
+void PWM_ON(int dutyA, int dutyB)
+{
+    pwmWrite(ENABLE_A, dutyA);
+    pwmWrite(ENABLE_B, dutyB);
+}
+
+void PWM_OFF()
+{
+    pwmWrite(ENABLE_A, 0);
+    pwmWrite(ENABLE_B, 0);
+}
+
+int init_color_sensor()
+{
+    // I2C initialization
+    int fd;
+    fd = wiringPiI2CSetup(SENSOR_ADDRESS);
+    if(fd == -1){
+        printf("Error during I2C initialization.");
+        return -1;
+    }
+
+    // Check if sensor is available and communicates by checking ID register
+    int ID;
+    wiringPiI2CWrite(fd, SENSOR_ID_REG);
+    ID = wiringPiI2CRead(fd);
+
+    // 77 = 0x4D
+    // 68 = 0x44
+    if(ID != 77 && ID != 68){
+        printf("Error! Sensor not found.");
+        return -1;
+    }
+    else	printf("Sensor found! Sensor ID is %d.\n", ID);
+
+    // Set RGBC time to a near maximum sample rate
+    wiringPiI2CWriteReg8(fd, SENSOR_RGBC_REG, 0xC0);
+
+    // Set minimum gain in control register - gain is x1
+    // If needed better resolution, change to x4 or x16
+    wiringPiI2CWriteReg8(fd, SENSOR_CONTROL_REG, 0x16);
+
+    // Enable register - set bits to start ADC and clock
+    wiringPiI2CWriteReg8(fd, SENSOR_ENABLE_REG, 0x03);
+
+    return fd;
+}
+
+int read_RED(int fd)
+{
+    int red_low_byte;
+    int red_high_byte;
+
+    // Reading low byte
+    wiringPiI2CWrite(fd, SENSOR_RED_CH_LOW);
+    red_low_byte = wiringPiI2CRead(fd);
+
+    // Reading high byte
+    wiringPiI2CWrite(fd, SENSOR_RED_CH_HIGH);
+    red_high_byte = wiringPiI2CRead(fd);
+
+    return (((int)red_high_byte << 8) | red_low_byte);
+}
+
+int read_GREEN(int fd)
+{
+    int green_low_byte;
+    int green_high_byte;
+
+    // Reading low byte
+    wiringPiI2CWrite(fd, SENSOR_GREEN_CH_LOW);
+    green_low_byte = wiringPiI2CRead(fd);
+
+    // Reading high byte
+    wiringPiI2CWrite(fd, SENSOR_GREEN_CH_HIGH);
+    green_high_byte = wiringPiI2CRead(fd);
+
+    return (((int)green_high_byte << 8) | green_low_byte);
+}
+
+int read_BLUE(int fd)
+{
+    int blue_low_byte;
+    int blue_high_byte;
+
+    // Reading low byte
+    wiringPiI2CWrite(fd, SENSOR_BLUE_CH_LOW);
+    blue_low_byte = wiringPiI2CRead(fd);
+
+    // Reading high byte
+    wiringPiI2CWrite(fd, SENSOR_BLUE_CH_HIGH);
+    blue_high_byte = wiringPiI2CRead(fd);
+
+    return (((int)blue_high_byte << 8) | blue_low_byte);
+}
+
+float measure_distance_front()
+{
+    int start_time;
+    int finish_time;
+
+    // Making sure TRIGGER pin is LOW
+    digitalWrite(TRIGGER_FRONT, 0);
+    delayMicroseconds(10);
+
+    // Sending 10us HIGH pulse
+    digitalWrite(TRIGGER_FRONT, 1);
+    delayMicroseconds(10);
+    digitalWrite(TRIGGER_FRONT, 0);
+
+    // Measuring distance starts as the ECHO pin becomes HIGH
+    while(digitalRead(ECHO_FRONT == 0)) start_time = micros();
+
+    // While ECHO pin is HIGH, ultrasonic waves have not returned to the reciever
+    // As the waves return, ECHO pin becames LOW
+    while(digitalRead(ECHO_FRONT == 1)) finish_time = micros();
+
+    // Calculating distance based on time elapsed and known speed of sound in the air
+    return (float)(finish_time - start_time) * 34300.0 / 2;
+}
+
+float measure_distance_back()
+{
+    int start_time;
+    int finish_time;
+
+    digitalWrite(TRIGGER_BACK, 0);
+    delayMicroseconds(10);
+
+    digitalWrite(TRIGGER_BACK, 1);
+    delayMicroseconds(10);
+    digitalWrite(TRIGGER_BACK, 0);
+
+    while(digitalRead(ECHO_BACK == 0)) start_time = micros();
+
+    while(digitalRead(ECHO_BACK == 1)) finish_time = micros();
+
+    return (float)(finish_time - start_time) * 34300.0 / 2;
+}
+
+void stop()
+{
+    PWM_OFF();
+
+    // Motor1
+    digitalWrite(IN1, 0);
+    digitalWrite(IN2, 0);
+
+    // Motor 2
+    digitalWrite(IN3, 0);
+    digitalWrite(IN4, 0);
+}
+
+void driveForward()
+{
+    PWM_ON(EN_A_VALUE, EN_B_VALUE);
+
+    // Motor1
+    digitalWrite(IN1, 1);
+    digitalWrite(IN2, 0);
+
+    // Motor 2
+    digitalWrite(IN3, 0);
+    digitalWrite(IN4, 1);
+}
+
+void driveBackward()
+{
+    PWM_ON(EN_A_VALUE, EN_B_VALUE);
+
+    // Motor1
+    digitalWrite(IN1, 0);
+    digitalWrite(IN2, 1);
+
+    // Motor 2
+    digitalWrite(IN3, 1);
+    digitalWrite(IN4, 0);
+}
+
+void turnLeft()
+{
+    PWM_ON(40, 0);
+
+    // Motor1
+    digitalWrite(IN1, 1);
+    digitalWrite(IN2, 0);
+
+    // Motor 2
+    digitalWrite(IN3, 0);
+    digitalWrite(IN4, 0);
+}
+
+void turnRight()
+{
+    PWM_ON(0, 60);
+
+    // Motor1
+    digitalWrite(IN1, 0);
+    digitalWrite(IN2, 0);
+
+    // Motor 2
+    digitalWrite(IN3, 0);
+    digitalWrite(IN4, 1);
+}
+
+void backward_turnLeft()
+{
+    PWM_ON(0, 60);
+
+    // Motor1
+    digitalWrite(IN1, 0);
+    digitalWrite(IN2, 0);
+
+    // Motor 2
+    digitalWrite(IN3, 1);
+    digitalWrite(IN4, 0);
+}
+
+void backward_turnRight()
+{
+    PWM_ON(40, 0);
+
+    // Motor1
+    digitalWrite(IN1, 0);
+    digitalWrite(IN2, 1);
+
+    // Motor 2
+    digitalWrite(IN3, 0);
+    digitalWrite(IN4, 0);
 }

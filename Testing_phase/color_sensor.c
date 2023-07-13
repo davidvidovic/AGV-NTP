@@ -33,12 +33,28 @@ int init_color_sensor()
 	
 	// Set minimum gain in control register - gain is x1
 	// If needed better resolution, change to x4 or x16
-	wiringPiI2CWriteReg8(fd, SENSOR_CONTROL_REG, 0x00);
+	wiringPiI2CWriteReg8(fd, SENSOR_CONTROL_REG, 0x16);
 	
 	// Enable register - set bits to start ADC and clock
 	wiringPiI2CWriteReg8(fd, SENSOR_ENABLE_REG, 0x03);
 	
 	return fd;
+}
+
+int read_CLEAR(int fd)
+{
+	int clear_low_byte;
+	int clear_high_byte;
+	
+	// Reading low byte
+	wiringPiI2CWrite(fd, SENSOR_CLEAR_CH_LOW);
+	clear_low_byte = wiringPiI2CRead(fd);
+	
+	// Reading high byte
+	wiringPiI2CWrite(fd, SENSOR_CLEAR_CH_HIGH);
+	clear_high_byte = wiringPiI2CRead(fd);
+	
+	return (((int)clear_high_byte << 8) | clear_low_byte);
 }
 
 int read_RED(int fd)
