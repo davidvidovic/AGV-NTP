@@ -19,7 +19,7 @@ void stop()
 
 void driveForward()
 {
-	PWM_ON();
+	PWM_ON(100, 100);
 	
 	// Motor1
 	digitalWrite(IN1, 1);
@@ -32,7 +32,7 @@ void driveForward()
 
 void driveBackward()
 {
-	PWM_ON();
+	PWM_ON(50, 50);
 	
 	// Motor1
 	digitalWrite(IN1, 0);
@@ -45,7 +45,7 @@ void driveBackward()
 
 void turnLeft()
 {
-	PWM_ON();
+	PWM_ON(EN_A_VALUE, EN_B_VALUE);
 	
 	// Motor1
 	digitalWrite(IN1, 1);
@@ -58,7 +58,7 @@ void turnLeft()
 
 void turnRight()
 {
-	PWM_ON();
+	PWM_ON(EN_A_VALUE, EN_B_VALUE);
 	
 	// Motor1
 	digitalWrite(IN1, 0);
@@ -71,7 +71,7 @@ void turnRight()
 
 void backward_turnLeft()
 {
-	PWM_ON();
+	PWM_ON(EN_A_VALUE, EN_B_VALUE);
 	
 	// Motor1
 	digitalWrite(IN1, 0);
@@ -84,7 +84,7 @@ void backward_turnLeft()
 
 void backward_turnRight()
 {
-	PWM_ON();
+	PWM_ON(EN_A_VALUE, EN_B_VALUE);
 	
 	// Motor1
 	digitalWrite(IN1, 0);

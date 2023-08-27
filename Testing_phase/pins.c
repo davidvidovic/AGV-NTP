@@ -29,10 +29,10 @@ void initPWM()
 	pwmSetMode(PWM_MODE_MS);
 }
 
-void PWM_ON()
+void PWM_ON(int duty_cycle1, int duty_cycle2)
 {
-	pwmWrite(ENABLE_A, EN_A_VALUE);
-	pwmWrite(ENABLE_B, EN_B_VALUE);
+	pwmWrite(ENABLE_A, duty_cycle1);
+	pwmWrite(ENABLE_B, duty_cycle2);
 }
 
 void PWM_OFF()

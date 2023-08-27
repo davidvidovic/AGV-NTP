@@ -7,6 +7,8 @@
 // Functions implementation
 int init_color_sensor()
 {
+	printf("Color sensor initialization...\n");
+
 	// I2C initialization
 	int fd;
 	fd = wiringPiI2CSetup(SENSOR_ADDRESS);

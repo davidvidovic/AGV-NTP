@@ -44,9 +44,10 @@
 
 
 // Defining tresholds for each color
-#define RED_TRESHOLD	620
-#define GREEN_TRESHOLD  18500
-#define BLUE_TRESHOLD	500
+#define RED_TRESHOLD    7000
+#define GREEN_TRESHOLD  7000
+#define BLUE_TRESHOLD	6000
+#define CLEAR_TRESHOLD 20000
 
 // Defining rooms - number of lines before and including that door - number of line on which robot should be triggered to turn
 #define HOME    0
@@ -71,6 +72,8 @@
 #define SENSOR_GREEN_CH_HIGH	0x99
 #define SENSOR_BLUE_CH_LOW	0x9A
 #define SENSOR_BLUE_CH_HIGH	0x9B
+#define SENSOR_CLEAR_CH_LOW	0x94
+#define SENSOR_CLEAR_CH_HIGH	0x95
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Dialog; }

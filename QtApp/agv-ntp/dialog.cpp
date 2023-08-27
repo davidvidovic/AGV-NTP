@@ -6,6 +6,7 @@ int init_color_sensor();
 int read_RED(int fd);
 int read_GREEN(int fd);
 int read_BLUE(int fd);
+int read_CLEAR(int fd);
 
 // Function to init GPIO pins as inputs, outputs or PWM outputs
 // To be called in setup part of the program
@@ -123,7 +124,7 @@ void Dialog::on_pushButton_clicked()
         box1->setEnabled(false);
         box2->setEnabled(false);
 
-        progress_bar->setValue(50);
+        //progress_bar->setValue(50);
 
         first_destination = box1->currentIndex();
         second_destination = box2->currentIndex();
@@ -267,29 +268,42 @@ void Dialog::on_pushButton_clicked()
 // FIRST PART OF DELIVERY - FROM HOME TO START DESTINATION
 void Dialog::FIRST_TRIP(int second_destination)
 {
+    int R, G, B, C;
     // DRIVE FORWARD FROM THE HOME SPOT
     driveForward();
     lines_counter = 0;
     while(lines_counter != second_destination)
     {
-        printf("%d\n", read_GREEN(fd));
-        while(read_GREEN(fd) < GREEN_TRESHOLD)
+        G = read_GREEN(fd);
+        R = read_RED(fd);
+        B = read_BLUE(fd);
+        C = read_CLEAR(fd);
+
+        //printf("%d\n", read_GREEN(fd));
+        while(G > GREEN_TRESHOLD ||
+              R < RED_TRESHOLD ||
+              B > BLUE_TRESHOLD
+              )
         {
-            printf("%d\n", read_GREEN(fd));
-            delay(20);
+            //printf("%d\n", read_GREEN(fd));
+            delay(10);
+            G = read_GREEN(fd);
+            R = read_RED(fd);
+            B = read_BLUE(fd);
+            //C = read_CLEAR(fd);
         }
 
-        //while(read_GREEN(fd) > GREEN_TRESHOLD);  // while its over the line
-        delay(500);
+        //while(read_GREEN(fd) > GREEN_TRESHOLD - 250);  // while its over the line
+        //delay(1000);
         printf("Presao liniju\n");
         lines_counter++;
         progress_count++;
         progress_bar->setValue((int)(progress_count / progress_sum * 100));
     }
-
+    printf("R %d  G %d  B %d  C %d\n", R, G, B, C);
     lines_counter = 0;
     stop();
-    delay(500);
+    delay(2000);
 
 
     // TURN
@@ -297,12 +311,31 @@ void Dialog::FIRST_TRIP(int second_destination)
     if(second_destination < 111) turnLeft();    // ZAMENI!!!!!!
     else turnRight();
 
-    //delay(500);
+    delay(1400);
+/*
+    G = read_GREEN(fd);
+    R = read_RED(fd);
+    B = read_BLUE(fd);
+    C = read_CLEAR(fd);
 
-    while(read_GREEN(fd) < GREEN_TRESHOLD) delay(20); // Keep turning until it hits the line
-    printf("%d %d %d\n", read_GREEN(fd), read_BLUE(fd), read_RED(fd));
+    //printf("%d\n", read_GREEN(fd));
+    while(G > GREEN_TRESHOLD ||
+          R < RED_TRESHOLD ||
+          B > BLUE_TRESHOLD
+          ) {
+            delay(10);
+            G = read_GREEN(fd);
+            R = read_RED(fd);
+            B = read_BLUE(fd); // Keep turning until it hits the line
+            }
+*/
+
     stop();
-    delay(500);
+    delay(1000);
+    printf("Idem napred\n");
+    // DRIVE FORWARD UNTIL IT REACHES THE LINE IN FRONT OF THE DOOR
+    driveForward();
+    delay(2000);
     progress_count++;
     progress_bar->setValue((int)(progress_count / progress_sum * 100));
 
@@ -317,13 +350,16 @@ void Dialog::FIRST_TRIP(int second_destination)
         while(measure_distance_front() < 200);
     }
 */
-    // DRIVE FORWARD UNTIL IT REACHES THE LINE IN FRONT OF THE DOOR
-    driveForward();
-    delay(1000);
-    while(read_GREEN(fd) < GREEN_TRESHOLD);
+
+    while(read_GREEN(fd) > GREEN_TRESHOLD ||
+          read_RED(fd) < RED_TRESHOLD ||
+          read_BLUE(fd) > BLUE_TRESHOLD ||
+          read_CLEAR(fd) > CLEAR_TRESHOLD
+          ) delay(20);
+    printf("R %d  G %d  B %d  C %d\n", read_RED(fd), read_GREEN(fd), read_BLUE(fd), read_CLEAR(fd));
     stop();
 
-    printf("Vrata");
+    printf("Vrata\n");
 
     //backward_flag = ~backward_flag;
 }
@@ -335,7 +371,13 @@ void Dialog::DELIVERY_TRIP(int first_destination, int second_destination)
     progress_bar->setValue((int)(progress_count / progress_sum * 100));
 
     driveBackward();
-    while(read_GREEN(fd) < GREEN_TRESHOLD);     // POSSIBLY ADD FOR IT TO CROSS THE LINE FIRST AND THEN TURN
+    delay(3000);
+    while(read_GREEN(fd) > GREEN_TRESHOLD ||
+          read_RED(fd) < RED_TRESHOLD ||
+          read_BLUE(fd) > BLUE_TRESHOLD ||
+          read_CLEAR(fd) > CLEAR_TRESHOLD
+          ) delay(20);
+    // POSSIBLY ADD FOR IT TO CROSS THE LINE FIRST AND THEN TURN
     stop();
     delay(1000);
 
@@ -347,7 +389,9 @@ void Dialog::DELIVERY_TRIP(int first_destination, int second_destination)
     else
         backward_turnRight();
 
-    while(read_GREEN(fd) < GREEN_TRESHOLD); // Keep turning until it reaches the line
+    //while(read_GREEN(fd) < GREEN_TRESHOLD); // Keep turning until it reaches the line
+    delay(1400);
+
     stop();
     delay(1000);
 
@@ -363,13 +407,18 @@ void Dialog::DELIVERY_TRIP(int first_destination, int second_destination)
         driveBackward();
     }
 
-    delay(100); // TO STEP OFF THE LINE IT IS CURRENTLY ON
+    delay(2000); // TO STEP OFF THE LINE IT IS CURRENTLY ON
 
     while(lines_counter != abs(second_destination - first_destination))
     {
-        while(read_GREEN(fd) < GREEN_TRESHOLD);
+        while(read_GREEN(fd) > GREEN_TRESHOLD ||
+              read_RED(fd) < RED_TRESHOLD ||
+              read_BLUE(fd) > BLUE_TRESHOLD ||
+              read_CLEAR(fd) > CLEAR_TRESHOLD
+              ) delay(20);
 
-        while(read_GREEN(fd) > GREEN_TRESHOLD);
+        delay(1000);
+        //while(read_GREEN(fd) > GREEN_TRESHOLD);
         lines_counter++;
 
         progress_count++;
@@ -383,10 +432,11 @@ void Dialog::DELIVERY_TRIP(int first_destination, int second_destination)
 
     // TURN
 
-    if(second_destination < 111) turnLeft();
-    else turnRight();
+    if(second_destination < 111) turnRight();
+    else turnLeft();
 
-    while(read_GREEN(fd) < GREEN_TRESHOLD); // Keep turning until it hits the line
+    delay(1400);
+    //while(read_GREEN(fd) < GREEN_TRESHOLD); // Keep turning until it hits the line
     stop();
     delay(1000);
 
@@ -409,7 +459,12 @@ void Dialog::DELIVERY_TRIP(int first_destination, int second_destination)
 */
     // DRIVE FORWARD UNTIL IT REACHES THE LINE IN FRONT OF THE DOOR
     driveForward();
-    while(read_GREEN(fd) < GREEN_TRESHOLD);
+    delay(2000);
+    while(read_GREEN(fd) > GREEN_TRESHOLD ||
+          read_RED(fd) < RED_TRESHOLD ||
+          read_BLUE(fd) > BLUE_TRESHOLD ||
+          read_CLEAR(fd) > CLEAR_TRESHOLD
+          ) delay(20);
     stop();
 
     progress_count++;
@@ -545,6 +600,22 @@ int init_color_sensor()
     return fd;
 }
 
+int read_CLEAR(int fd)
+{
+    int clear_low_byte;
+    int clear_high_byte;
+
+    // Reading low byte
+    wiringPiI2CWrite(fd, SENSOR_CLEAR_CH_LOW);
+    clear_low_byte = wiringPiI2CRead(fd);
+
+    // Reading high byte
+    wiringPiI2CWrite(fd, SENSOR_CLEAR_CH_HIGH);
+    clear_high_byte = wiringPiI2CRead(fd);
+
+    return (((int)clear_high_byte << 8) | clear_low_byte);
+}
+
 int read_RED(int fd)
 {
     int red_low_byte;
@@ -665,7 +736,7 @@ void driveForward()
 
 void driveBackward()
 {
-    PWM_ON(EN_A_VALUE, EN_B_VALUE);
+    PWM_ON(50, 50);
 
     // Motor1
     digitalWrite(IN1, 0);

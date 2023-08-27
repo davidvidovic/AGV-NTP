@@ -43,7 +43,7 @@ void initGPIO();
 void initPWM();
 
 // Turn the PWM ON
-void PWM_ON();
+void PWM_ON(int duty_cycle1, int duty_cycle2);
 
 // Turn the PWM OFF
 void PWM_OFF();
