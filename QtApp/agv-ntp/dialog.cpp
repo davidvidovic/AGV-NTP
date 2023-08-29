@@ -124,8 +124,6 @@ void Dialog::on_pushButton_clicked()
         box1->setEnabled(false);
         box2->setEnabled(false);
 
-        //progress_bar->setValue(50);
-
         first_destination = box1->currentIndex();
         second_destination = box2->currentIndex();
 
@@ -266,12 +264,15 @@ void Dialog::on_pushButton_clicked()
 }
 
 // FIRST PART OF DELIVERY - FROM HOME TO START DESTINATION
+
 void Dialog::FIRST_TRIP(int second_destination)
 {
     int R, G, B, C;
+    
     // DRIVE FORWARD FROM THE HOME SPOT
     driveForward();
     lines_counter = 0;
+    
     while(lines_counter != second_destination)
     {
         G = read_GREEN(fd);
@@ -293,78 +294,57 @@ void Dialog::FIRST_TRIP(int second_destination)
             //C = read_CLEAR(fd);
         }
 
-        //while(read_GREEN(fd) > GREEN_TRESHOLD - 250);  // while its over the line
-        //delay(1000);
         printf("Presao liniju\n");
         lines_counter++;
         progress_count++;
         progress_bar->setValue((int)(progress_count / progress_sum * 100));
     }
-    printf("R %d  G %d  B %d  C %d\n", R, G, B, C);
+    
+    //printf("R %d  G %d  B %d  C %d\n", R, G, B, C);
     lines_counter = 0;
+    
     stop();
     delay(2000);
 
 
     // TURN
 
-    if(second_destination < 111) turnLeft();    // ZAMENI!!!!!!
-    else turnRight();
+    if(second_destination < 111) turnRight();    // ZAMENI!!!!!!
+    else turnLeft();
+
 
     delay(1400);
-/*
-    G = read_GREEN(fd);
-    R = read_RED(fd);
-    B = read_BLUE(fd);
-    C = read_CLEAR(fd);
 
-    //printf("%d\n", read_GREEN(fd));
-    while(G > GREEN_TRESHOLD ||
-          R < RED_TRESHOLD ||
-          B > BLUE_TRESHOLD
-          ) {
-            delay(10);
-            G = read_GREEN(fd);
-            R = read_RED(fd);
-            B = read_BLUE(fd); // Keep turning until it hits the line
-            }
-*/
 
     stop();
     delay(1000);
-    printf("Idem napred\n");
+    
+    // printf("Idem napred\n");
+    
     // DRIVE FORWARD UNTIL IT REACHES THE LINE IN FRONT OF THE DOOR
     driveForward();
     delay(2000);
+    
     progress_count++;
     progress_bar->setValue((int)(progress_count / progress_sum * 100));
-
-
-    // CHECK IF DOOR IS OPEN
-/*
-    if(measure_distance_front() < 200)  // DOOR CLOSED - TO BE CALIBRATED
-    {
-        stop();
-        string = "Door seems to be closed. Please open the door.";
-        label_status_bar->setText(string);
-        while(measure_distance_front() < 200);
-    }
-*/
 
     while(read_GREEN(fd) > GREEN_TRESHOLD ||
           read_RED(fd) < RED_TRESHOLD ||
           read_BLUE(fd) > BLUE_TRESHOLD ||
           read_CLEAR(fd) > CLEAR_TRESHOLD
           ) delay(20);
-    printf("R %d  G %d  B %d  C %d\n", read_RED(fd), read_GREEN(fd), read_BLUE(fd), read_CLEAR(fd));
+          
+    //printf("R %d  G %d  B %d  C %d\n", read_RED(fd), read_GREEN(fd), read_BLUE(fd), read_CLEAR(fd));
     stop();
 
-    printf("Vrata\n");
+    // printf("Vrata\n");
 
     //backward_flag = ~backward_flag;
 }
 
+
 // MIDDLE PART OF DELIVERY - FROM FIRST TO SECOND DESTINATION
+
 void Dialog::DELIVERY_TRIP(int first_destination, int second_destination)
 {
     progress_count++;
@@ -372,11 +352,13 @@ void Dialog::DELIVERY_TRIP(int first_destination, int second_destination)
 
     driveBackward();
     delay(3000);
+    
     while(read_GREEN(fd) > GREEN_TRESHOLD ||
           read_RED(fd) < RED_TRESHOLD ||
           read_BLUE(fd) > BLUE_TRESHOLD ||
           read_CLEAR(fd) > CLEAR_TRESHOLD
           ) delay(20);
+    
     // POSSIBLY ADD FOR IT TO CROSS THE LINE FIRST AND THEN TURN
     stop();
     delay(1000);
@@ -389,7 +371,6 @@ void Dialog::DELIVERY_TRIP(int first_destination, int second_destination)
     else
         backward_turnRight();
 
-    //while(read_GREEN(fd) < GREEN_TRESHOLD); // Keep turning until it reaches the line
     delay(1400);
 
     stop();
@@ -436,46 +417,42 @@ void Dialog::DELIVERY_TRIP(int first_destination, int second_destination)
     else turnLeft();
 
     delay(1400);
-    //while(read_GREEN(fd) < GREEN_TRESHOLD); // Keep turning until it hits the line
+
     stop();
     delay(1000);
 
     progress_count++;
     progress_bar->setValue((int)(progress_count / progress_sum * 100));
 
-    // CHECK IF DOOR IS OPEN
-/*
-    if(measure_distance_front() < 200)  // DOOR CLOSED - TO BE CALIBRATED
-    {
-        stop();
-        string = "Door seems to be closed. Please open the door.";
-        label_status_bar->setText(string);
-
-        while(measure_distance_front() < 200);
-
-        string = "Door open! Continuing delivery.";
-        label_status_bar->setText(string);
-    }
-*/
     // DRIVE FORWARD UNTIL IT REACHES THE LINE IN FRONT OF THE DOOR
     driveForward();
     delay(2000);
+    
     while(read_GREEN(fd) > GREEN_TRESHOLD ||
           read_RED(fd) < RED_TRESHOLD ||
           read_BLUE(fd) > BLUE_TRESHOLD ||
           read_CLEAR(fd) > CLEAR_TRESHOLD
           ) delay(20);
+    
     stop();
 
     progress_count++;
     progress_bar->setValue((int)(progress_count / progress_sum * 100));
 }
 
+
 // FINAL PART OF DELIVERY - FROM SECONDD DESTINATION GET BACK TO HOME SPOT
+
 void Dialog::HOME_TRIP(int first_destination)
 {
     driveBackward();
-    while(read_GREEN(fd) < GREEN_TRESHOLD);     // POSSIBLY ADD FOR IT TO CROSS THE LINE FIRST AND THEN TURN
+    
+    while(read_GREEN(fd) > GREEN_TRESHOLD ||
+          read_RED(fd) < RED_TRESHOLD ||
+          read_BLUE(fd) > BLUE_TRESHOLD ||
+          read_CLEAR(fd) > CLEAR_TRESHOLD
+          ) delay(20);
+   
     stop();
     delay(1000);
 
@@ -487,33 +464,32 @@ void Dialog::HOME_TRIP(int first_destination)
     else
         backward_turnRight();
 
-    while(read_GREEN(fd) < GREEN_TRESHOLD); // Keep turning until it reaches the line
+    delay(1400);
+
     stop();
     delay(1000);
-
+    
     progress_count++;
     progress_bar->setValue((int)(progress_count / progress_sum * 100));
 
     driveBackward();
-    while(read_RED(fd) < RED_TRESHOLD)   // Keep turning until it reaches the line - HOME LINE IS MARKED RED
+    
+    lines_counter = 0;
+    
+   	while(lines_counter != second_destination)
     {
-        /*
-        if(measure_distance_back() < 20)
-        {
-            stop();
-            delay(1000);
+        while(read_GREEN(fd) > GREEN_TRESHOLD ||
+              read_RED(fd) < RED_TRESHOLD ||
+              read_BLUE(fd) > BLUE_TRESHOLD ||
+              read_CLEAR(fd) > CLEAR_TRESHOLD
+              ) delay(20);
 
-            string = "Something seems to be in the way. Wait or clear the path.";
-            label_status_bar->setText(string);
+        delay(1000);
+        
+        lines_counter++;
 
-            while(measure_distance_back() < 20) delay(1000);
-
-            driveBackward();
-
-            string = "Robot is retrieving to home spot.";
-            label_status_bar->setText(string);
-        }
-        */
+        progress_count++;
+        progress_bar->setValue((int)(progress_count / progress_sum * 100));
     }
 
     stop();
@@ -521,6 +497,70 @@ void Dialog::HOME_TRIP(int first_destination)
     progress_bar->setValue(100);  // DELIVERY OVER
 }
 
+void driveBackward()
+{
+    PWM_ON(50, 50);
+
+    // Motor1
+    digitalWrite(IN1, 0);
+    digitalWrite(IN2, 1);
+
+    // Motor 2
+    digitalWrite(IN3, 1);
+    digitalWrite(IN4, 0);
+}
+
+void turnLeft()
+{
+    PWM_ON(40, 0);
+
+    // Motor1
+    digitalWrite(IN1, 1);
+    digitalWrite(IN2, 0);
+
+    // Motor 2
+    digitalWrite(IN3, 0);
+    digitalWrite(IN4, 0);
+}
+
+void turnRight()
+{
+    PWM_ON(0, 60);
+
+    // Motor1
+    digitalWrite(IN1, 0);
+    digitalWrite(IN2, 0);
+
+    // Motor 2
+    digitalWrite(IN3, 0);
+    digitalWrite(IN4, 1);
+}
+
+void backward_turnLeft()
+{
+    PWM_ON(0, 60);
+
+    // Motor1
+    digitalWrite(IN1, 0);
+    digitalWrite(IN2, 0);
+
+    // Motor 2
+    digitalWrite(IN3, 1);
+    digitalWrite(IN4, 0);
+}
+
+void backward_turnRight()
+{
+    PWM_ON(40, 0);
+
+    // Motor1
+    digitalWrite(IN1, 0);
+    digitalWrite(IN2, 1);
+
+    // Motor 2
+    digitalWrite(IN3, 0);
+    digitalWrite(IN4, 0);
+}
 
 
 // Function implementation
@@ -734,67 +774,4 @@ void driveForward()
     digitalWrite(IN4, 1);
 }
 
-void driveBackward()
-{
-    PWM_ON(50, 50);
 
-    // Motor1
-    digitalWrite(IN1, 0);
-    digitalWrite(IN2, 1);
-
-    // Motor 2
-    digitalWrite(IN3, 1);
-    digitalWrite(IN4, 0);
-}
-
-void turnLeft()
-{
-    PWM_ON(40, 0);
-
-    // Motor1
-    digitalWrite(IN1, 1);
-    digitalWrite(IN2, 0);
-
-    // Motor 2
-    digitalWrite(IN3, 0);
-    digitalWrite(IN4, 0);
-}
-
-void turnRight()
-{
-    PWM_ON(0, 60);
-
-    // Motor1
-    digitalWrite(IN1, 0);
-    digitalWrite(IN2, 0);
-
-    // Motor 2
-    digitalWrite(IN3, 0);
-    digitalWrite(IN4, 1);
-}
-
-void backward_turnLeft()
-{
-    PWM_ON(0, 60);
-
-    // Motor1
-    digitalWrite(IN1, 0);
-    digitalWrite(IN2, 0);
-
-    // Motor 2
-    digitalWrite(IN3, 1);
-    digitalWrite(IN4, 0);
-}
-
-void backward_turnRight()
-{
-    PWM_ON(40, 0);
-
-    // Motor1
-    digitalWrite(IN1, 0);
-    digitalWrite(IN2, 1);
-
-    // Motor 2
-    digitalWrite(IN3, 0);
-    digitalWrite(IN4, 0);
-}
